@@ -1,4 +1,11 @@
 <div>
-  <h2>MyTabs</h2>
+  <ul>
+    <li *ngFor="#pane of panes"
+        [class.active]="pane.selected"
+        (click)="onPaneClicked(pane)">
+      {{pane.title}}
+    </li>
+  </ul>
+
   <ng-content></ng-content>
 </div>
