@@ -1,4 +1,4 @@
-import {Component, Input} from 'angular2/core';
+import {Component} from 'angular2/core';
 
 @Component({
   selector: 'my-tabs',
@@ -38,6 +38,7 @@ export class MyTabsComponent {
 
 @Component({
   selector: 'my-pane',
+  inputs: ['title'],
   template: `
 <div [style.display]="selected ? 'inherit' : 'none'">
   <ng-content></ng-content>
@@ -45,8 +46,6 @@ export class MyTabsComponent {
     `,
 })
 export class MyPaneComponent {
-  @Input() title: string
-
   constructor(tabs : MyTabsComponent) {
     tabs.addPane(this)
   }
