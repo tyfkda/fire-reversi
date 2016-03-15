@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "concurrently \"npm run tsc:w\" \"npm run lite\" ",
-    "tsc": "tsc",
-    "tsc:w": "tsc -w",
+    "tsc": "tsc --outDir app",
+    "tsc:w": "tsc -w --outDir app",
     "lite": "lite-server",
     "typings": "typings",
     "postinstall": "typings install"
