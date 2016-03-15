@@ -31,7 +31,6 @@ export class MyTabsComponent {
   }
 
   onPaneClicked(pane : MyPaneComponent) {
-    console.log(pane)
     this.panes.forEach(p => p.selected = p == pane)
   }
 }
