@@ -2,7 +2,18 @@ import {Component, Input} from 'angular2/core';
 
 @Component({
   selector: 'my-tabs',
-  templateUrl: 'my-tabs.component.html',
+  template: `
+<div>
+  <ul>
+    <li *ngFor="#pane of panes"
+        [class.active]="pane.selected"
+        (click)="onPaneClicked(pane)">
+      {{pane.title}}
+    </li>
+  </ul>
+  <ng-content></ng-content>
+</div>
+    `,
   styles:[`
           .active {
             background-color: red;
@@ -27,7 +38,11 @@ export class MyTabsComponent {
 
 @Component({
   selector: 'my-pane',
-  templateUrl: 'my-pane.component.html',
+  template: `
+<div [style.display]="selected ? 'inherit' : 'none'">
+  <ng-content></ng-content>
+</div>
+    `,
 })
 export class MyPaneComponent {
   @Input() title: string
