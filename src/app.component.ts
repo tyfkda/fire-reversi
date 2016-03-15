@@ -15,10 +15,13 @@ import {MyTabsComponent, MyPaneComponent} from './my-tabs.component';
   <my-pane title="World">
     <h4>World</h4>
     <em>Mauris elementum elementum enim at suscipit.</em>
-    <p><a href ng-click="i = i + 1">counter: {{i || 0}}</a></p>
+    <p><span (click)="count = count + 1">counter: {{count}}</span></p>
   </my-pane>
 </my-tabs>
     `,
 })
-
-export class AppComponent { }
+export class AppComponent {
+  constructor() {
+    this.count = 0
+  }
+}
