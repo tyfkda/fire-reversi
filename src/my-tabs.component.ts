@@ -39,7 +39,7 @@ export class MyTabsComponent {
   selector: 'my-pane',
   inputs: ['title'],
   template: `
-<div [style.display]="selected ? 'inherit' : 'none'">
+<div [hidden]="!selected">
   <ng-content></ng-content>
 </div>
     `,
