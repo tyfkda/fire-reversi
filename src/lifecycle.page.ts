@@ -1,6 +1,6 @@
-import {Component} from 'angular2/core';
+import {Component} from 'angular2/core'
 
-import {ParentComponent} from './parent.component';
+import {ParentComponent} from './parent.component'
 
 @Component({
   directives: [ParentComponent],
