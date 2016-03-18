@@ -1,5 +1,5 @@
 import {Component} from 'angular2/core';
-import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
+import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {TabPage} from './tab.page';
 import {TopPage} from './top.page';
@@ -7,7 +7,6 @@ import {TopPage} from './top.page';
 @Component({
   selector: 'my-app',
   directives: [ROUTER_DIRECTIVES],
-  providers: [ROUTER_PROVIDERS],
   template: `
 <style>
 nav a.router-link-active {
