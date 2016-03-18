@@ -3,7 +3,6 @@ import {Component} from 'angular2/core';
 import {MyTabsComponent, MyPaneComponent} from './my-tabs.component';
 
 @Component({
-  selector: 'tab-page',
   directives: [MyTabsComponent, MyPaneComponent],
   template: `
 <h2>Tab page</h2>
