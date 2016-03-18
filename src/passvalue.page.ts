@@ -5,7 +5,7 @@ import {Component, Input} from 'angular2/core'
   selector: 'my-element',
   template: `
 <div style="border: 1px solid green; margin: 4px; padding: 4px;"
-     (click)="onElementClicked()">
+     (click)="onClicked()">
   {{name}}
 </div>
     `,
@@ -14,7 +14,7 @@ export class MyElementComponent {
   @Input() name: string
   @Input() elementClicked: Any
 
-  onElementClicked() {
+  onClicked() {
     this.elementClicked(this)
   }
 }
@@ -35,13 +35,6 @@ export class MyElementComponent {
 export class MyListComponent {
   @Input() list: Array<string>
   @Input() elementClicked: Any
-
-  constructor() {
-  }
-
-  ngOnInit() {
-    console.log(this.list)
-  }
 }
 
 
@@ -53,16 +46,20 @@ export class MyListComponent {
 <div>
     <my-list [list]="list" [elementClicked]="onElementClicked"></my-list>
 </div>
+
+<ul>
+    <li *ngFor="#name of clicked">{{name}} clicked
+</ul>
     `,
 })
 export class PassValuePage {
-  list: Array<string>
+  list: Array<string> = []
+  clicked: Array<string> = []
 
-  constructor() {
+  ngOnInit() {
     this.list = ['hoge', 'fuga', 'piyo']
-  }
-
-  onElementClicked(element) {
-    console.log(element)
+    this.onElementClicked = (element) => {
+      this.clicked.push(element.name)
+    }
   }
 }
