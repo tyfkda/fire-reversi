@@ -9,6 +9,11 @@ import {TopPage} from './top.page';
   directives: [ROUTER_DIRECTIVES],
   providers: [ROUTER_PROVIDERS],
   template: `
+<style>
+nav a.router-link-active {
+  background-color: red;
+}
+</style>
 <nav>
   <a [routerLink]="['TopPage']">Top</a>
   <a [routerLink]="['TabPage']">Tab</a>
