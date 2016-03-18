@@ -40,6 +40,10 @@ nav a.router-link-active {
     name: 'LifeCyclePage',
     component: LifeCyclePage,
   },
+  {
+    path: '/**',
+    redirectTo: ['TopPage'],
+  }
 ])
 export class AppComponent {
 }
