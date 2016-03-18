@@ -21,9 +21,7 @@ import {Component} from 'angular2/core';
           `],
 })
 export class MyTabsComponent {
-  constructor() {
-    this.panes = []
-  }
+  panes: Array<MyPaneComponent> = []
 
   addPane(pane : MyPaneComponent) {
     this.panes.push(pane)
@@ -45,6 +43,8 @@ export class MyTabsComponent {
     `,
 })
 export class MyPaneComponent {
+  selected = false
+
   constructor(tabs : MyTabsComponent) {
     tabs.addPane(this)
   }
