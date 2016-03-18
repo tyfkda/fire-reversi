@@ -1,20 +1,22 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, Input, OnInit} from 'angular2/core';
 
 @Component({
   selector: 'child-component',
   template: `
 <div style="margin: 4px; border: solid 1px green;">
-  <div>Child</div>
+    <div>Child: {{name}}</div>
 </div>
     `,
 })
 export class ChildComponent implements OnInit {
+  @Input() name: string
+
   ngOnInit() {
-    console.log('Child#ngOnInit')
+    console.log(`Child[${this.name}]#ngOnInit`)
   }
 
   ngOnDestroy() {
-    console.log('Child#ngOnDestroy')
+    console.log(`Child[${this.name}]#ngOnDestroy`)
   }
 }
 
@@ -25,7 +27,8 @@ export class ChildComponent implements OnInit {
 <div style="margin: 4px; border: solid 1px blue;">
   <div>Parent</div>
 
-  <child-component></child-component>
+  <child-component name="child1"></child-component>
+  <child-component name="child2"></child-component>
 </div>
     `,
 })
