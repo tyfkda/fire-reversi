@@ -1,5 +1,6 @@
 import {Component, Input} from 'angular2/core'
 
+interface OnElementClicked{(element: MyElementComponent) :void}
 
 @Component({
   selector: 'my-element',
@@ -12,7 +13,7 @@ import {Component, Input} from 'angular2/core'
 })
 export class MyElementComponent {
   @Input() name: string
-  @Input() elementClicked: Any
+  @Input() elementClicked: OnElementClicked
 
   onClicked() {
     this.elementClicked(this)
@@ -34,7 +35,7 @@ export class MyElementComponent {
 })
 export class MyListComponent {
   @Input() list: Array<string>
-  @Input() elementClicked: Any
+  @Input() elementClicked: OnElementClicked
 }
 
 
@@ -55,6 +56,7 @@ export class MyListComponent {
 export class PassValuePage {
   list: Array<string> = []
   clicked: Array<string> = []
+  onElementClicked: OnElementClicked
 
   ngOnInit() {
     this.list = ['hoge', 'fuga', 'piyo']
