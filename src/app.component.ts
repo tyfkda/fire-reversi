@@ -1,27 +1,24 @@
 import {Component} from 'angular2/core';
-import {MyTabsComponent, MyPaneComponent} from './my-tabs.component';
+import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
+
+import {TopPage} from './top.page';
 
 @Component({
   selector: 'my-app',
-  directives: [MyTabsComponent, MyPaneComponent],
+  directives: [ROUTER_DIRECTIVES],
+  providers: [ROUTER_PROVIDERS],
   template: `
 <h1>My First Angular 2 App</h1>
-
-<my-tabs>
-  <my-pane title="Hello">
-    <h4>Hello</h4>
-    <p>Lorem ipsum dolor sit amet</p>
-  </my-pane>
-  <my-pane title="World">
-    <h4>World</h4>
-    <em>Mauris elementum elementum enim at suscipit.</em>
-    <p><span (click)="count = count + 1">counter: {{count}}</span></p>
-  </my-pane>
-</my-tabs>
+    <router-outlet></router-outlet>
     `,
 })
+@RouteConfig([
+  {
+    path: '/',
+    name: 'Top',
+    component: TopPage,
+    useAsDefault: true,
+  },
+])
 export class AppComponent {
-  constructor() {
-    this.count = 0
-  }
 }
