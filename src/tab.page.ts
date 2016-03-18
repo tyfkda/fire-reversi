@@ -1,6 +1,54 @@
 import {Component} from 'angular2/core';
 
-import {MyTabsComponent, MyPaneComponent} from './my-tabs.component';
+@Component({
+  selector: 'my-tabs',
+  template: `
+<div>
+  <ul>
+    <li *ngFor="#pane of panes"
+        [class.active]="pane.selected"
+        (click)="onPaneClicked(pane)">
+      {{pane.title}}
+    </li>
+  </ul>
+  <ng-content></ng-content>
+</div>
+    `,
+  styles:[`
+          .active {
+            background-color: red;
+          }
+          `],
+})
+export class MyTabsComponent {
+  panes: Array<MyPaneComponent> = []
+
+  addPane(pane : MyPaneComponent) {
+    this.panes.push(pane)
+    pane.selected = this.panes.length == 1
+  }
+
+  onPaneClicked(pane : MyPaneComponent) {
+    this.panes.forEach(p => p.selected = p == pane)
+  }
+}
+
+@Component({
+  selector: 'my-pane',
+  inputs: ['title'],
+  template: `
+<div [hidden]="!selected">
+  <ng-content></ng-content>
+</div>
+    `,
+})
+export class MyPaneComponent {
+  selected = false
+
+  constructor(tabs : MyTabsComponent) {
+    tabs.addPane(this)
+  }
+}
 
 @Component({
   directives: [MyTabsComponent, MyPaneComponent],
