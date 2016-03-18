@@ -2,6 +2,7 @@ import {Component} from 'angular2/core'
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router'
 
 import {LifeCyclePage} from './lifecycle.page'
+import {PassValuePage} from './passvalue.page'
 import {TabPage} from './tab.page'
 import {TopPage} from './top.page'
 
@@ -18,6 +19,7 @@ nav a.router-link-active {
   <a [routerLink]="['TopPage']">Top</a>
   <a [routerLink]="['TabPage']">Tab</a>
   <a [routerLink]="['LifeCyclePage']">LifeCycle</a>
+  <a [routerLink]="['PassValuePage']">PassValue</a>
 </nav>
 <hr>
     <router-outlet></router-outlet>
@@ -39,6 +41,11 @@ nav a.router-link-active {
     path: '/lifecycle',
     name: 'LifeCyclePage',
     component: LifeCyclePage,
+  },
+  {
+    path: '/passvalue',
+    name: 'PassValuePage',
+    component: PassValuePage,
   },
   {
     path: '/**',
