@@ -1,4 +1,18 @@
 import {Component} from 'angular2/core';
+import {ContentChildren, QueryList} from 'angular2/core';
+
+@Component({
+  selector: 'my-pane',
+  inputs: ['title'],
+  template: `
+<div [hidden]="!selected">
+  <ng-content></ng-content>
+</div>
+    `,
+})
+export class MyPaneComponent {
+  selected = false
+}
 
 @Component({
   selector: 'my-tabs',
@@ -7,7 +21,7 @@ import {Component} from 'angular2/core';
   <ul>
     <li *ngFor="#pane of panes"
         [class.active]="pane.selected"
-        (click)="onPaneClicked(pane)">
+        (click)="selectPane(pane)">
       {{pane.title}}
     </li>
   </ul>
@@ -21,32 +35,15 @@ import {Component} from 'angular2/core';
           `],
 })
 export class MyTabsComponent {
-  panes: Array<MyPaneComponent> = []
+  @ContentChildren(MyPaneComponent) panes: QueryList<MyPaneComponent>
 
-  addPane(pane : MyPaneComponent) {
-    this.panes.push(pane)
-    pane.selected = this.panes.length == 1
+  ngAfterContentInit() {
+    if (this.panes.length > 0)
+      this.selectPane(this.panes.first)
   }
 
-  onPaneClicked(pane : MyPaneComponent) {
-    this.panes.forEach(p => p.selected = p == pane)
-  }
-}
-
-@Component({
-  selector: 'my-pane',
-  inputs: ['title'],
-  template: `
-<div [hidden]="!selected">
-  <ng-content></ng-content>
-</div>
-    `,
-})
-export class MyPaneComponent {
-  selected = false
-
-  constructor(tabs : MyTabsComponent) {
-    tabs.addPane(this)
+  selectPane(pane: MyPaneComponent) {
+    this.panes.toArray().forEach(p => p.selected = p == pane)
   }
 }
 
