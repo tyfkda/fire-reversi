@@ -18,8 +18,7 @@ nav a.router-link-active {
   <a [routerLink]="['TopPage']">Top</a>
   <a [routerLink]="['TabPage']">Tab</a>
 </nav>
-
-<h1>My First Angular 2 App</h1>
+<hr>
     <router-outlet></router-outlet>
     `,
 })
