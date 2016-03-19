@@ -4,6 +4,13 @@ import {JSONP_PROVIDERS} from 'angular2/http'
 import {URLSearchParams, Jsonp} from 'angular2/http';
 
 import Rx from 'rxjs/Rx'
+Rx  // これをつけないとエラーが出る？  ORIGINAL EXCEPTION: TypeError: terms.debounceTime is not a function
+// 個別にimportしてもよいが、メンドイ
+//import {Observable} from 'rxjs/Observable';
+//import 'rxjs/add/operator/map';
+//import 'rxjs/add/operator/debounceTime';
+//import 'rxjs/add/operator/distinctUntilChanged';
+//import 'rxjs/add/operator/switchMap';
 
 @Injectable()
 export class WikipediaService {
@@ -42,14 +49,6 @@ export class ObservablePage {
   items: Rx.Observable<Array<string>>
 
   constructor(private wikipediaService: WikipediaService) {
-    console.log(wikipediaService)
-
-    Rx.Observable.of(1, 2, 3)
-      .map(x => x + '!!!')
-      .subscribe(x => {
-        console.log(x)
-      })
-
     this.items = wikipediaService.search(this.term.valueChanges)
   }
 }
