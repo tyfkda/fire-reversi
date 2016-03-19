@@ -27,5 +27,5 @@ nav a.router-link-active {
     useAsDefault: true,
   },
 ])
-export class AppComponent {
+export class App {
 }
