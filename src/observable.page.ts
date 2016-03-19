@@ -9,7 +9,13 @@ import Rx from 'rxjs/Rx'
 export class WikipediaService {
   constructor(private jsonp: Jsonp) {}
 
-  search(term: string) {
+  search(terms: Observable<string>, debounceDuration = 400) {
+    return terms.debounceTime(debounceDuration)
+      .distinctUntilChanged()
+      .switchMap(term => this.rawSearch(term)))
+  }
+
+  rawSearch(term: string) {
     var search = new URLSearchParams()
     search.set('action', 'opensearch');
     search.set('search', term);
@@ -44,9 +50,6 @@ export class ObservablePage {
         console.log(x)
       })
 
-    this.items = this.term.valueChanges
-      .debounceTime(400)
-      .distinctUntilChanged()
-      .switchMap(term => this.wikipediaService.search(term))
+    this.items = wikipediaService.search(this.term.valueChanges)
   }
 }
