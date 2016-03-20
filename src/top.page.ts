@@ -20,7 +20,9 @@ function isValidPos(x, y) {
     ></div>
   </div>
   <div class="pull-left" style="margin-left: 8px;">
-    Turn: {{turn==0?'Black':'White'}}
+    <div>Turn: {{turn==0?'Black':'White'}}</div>
+    <br>
+    <div>Black:#{{circleCount[0]}}, White:{{circleCount[1]}}</div>
   </div>
 </div>
 
@@ -35,19 +37,21 @@ export class TopPage {
   authData: any;
   board: Array<Array<Object>>
   turn: number
+  circleCount: Array<number>
 
   constructor() {
     this.movesUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/movess'
     this.movesRef = new Firebase(this.movesUrl)
     this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
-      this.putColor(cell.x, cell.y, cell.color, true)
+      const n = this.putColor(cell.x, cell.y, cell.color, true)
       this.turn = 1 - (cell.color - 1)
     })
 
     this._ = _
 
     this.board = TopPage.createInitialBoard()
+    this.circleCount = [2, 2]
     this.turn = 0
   }
 
@@ -60,8 +64,11 @@ export class TopPage {
         flipped += this.checkReverse(x, y, j, i, color, flip)
       }
     }
-    if (flip && flipped >= 0)
+    if (flip && flipped >= 0) {
       this.board[y][x].color = color
+      this.circleCount[color - 1] += flipped + 1
+      this.circleCount[2 - color] -= flipped
+    }
     return flipped
   }
 
