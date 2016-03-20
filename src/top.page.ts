@@ -23,6 +23,12 @@ function isValidPos(x, y) {
     <div>Turn: {{turn==0?'Black':'White'}}</div>
     <br>
     <div>Black:#{{circleCount[0]}}, White:{{circleCount[1]}}</div>
+    <br>
+    <div [hidden]="!gameOver">
+      <div [hidden]="winPlayer!=1">BLACK win!</div>
+      <div [hidden]="winPlayer!=2">WHITE win!</div>
+      <div [hidden]="winPlayer!=0">draw</div>
+    </div>
   </div>
 </div>
 
@@ -38,6 +44,8 @@ export class TopPage {
   board: Array<Array<Object>>
   turn: number
   circleCount: Array<number>
+  gameOver: boolearn
+  winPlayer: number
 
   constructor() {
     this.movesUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/movess'
@@ -53,6 +61,8 @@ export class TopPage {
     this.board = TopPage.createInitialBoard()
     this.circleCount = [2, 2]
     this.turn = 0
+    this.gameOver = false
+    this.winPlayer = -1
   }
 
   putColor(x, y, color, flip) {
@@ -68,8 +78,23 @@ export class TopPage {
       this.board[y][x].color = color
       this.circleCount[color - 1] += flipped + 1
       this.circleCount[2 - color] -= flipped
+      this.checkGameOver()
     }
     return flipped
+  }
+
+  checkGameOver() {
+    if ((this.circleCount[0] + this.circleCount[1] >= 64) ||  // Full.
+        (this.circleCount[0] == 0) ||
+        (this.circleCount[1] == 0)) {
+      this.gameOver = true
+      if (this.circleCount[0] > this.circleCount[1])
+        this.winPlayer = 1
+      else if (this.circleCount[0] < this.circleCount[1])
+        this.winPlayer = 2
+      else
+        this.winPlayer = 0  // draw
+    }
   }
 
   checkReverse(x, y, dx, dy, color, flip) {
