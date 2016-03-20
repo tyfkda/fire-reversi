@@ -26,22 +26,18 @@ export class TopPage {
     this.movesRef = new Firebase(this.movesUrl)
     this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
-      this.board[cell.y][cell.x].color = cell.color
+      this.putColor(cell.x, cell.y, cell.color)
       this.turn = 1 - (cell.color - 1)
     })
 
     this._ = _
 
-    this.board = _.range(8).map(y => {
-      return _.range(8).map(x => {
-        return {
-          x,
-          y,
-          color: 0,
-        }
-      })
-    })
+    this.board = TopPage.createInitialBoard()
     this.turn = 0
+  }
+
+  putColor(x, y, color) {
+    this.board[y][x].color = color
   }
 
   getCellImage(cell) {
@@ -58,5 +54,22 @@ export class TopPage {
 
     cell.color = this.turn + 1
     this.movesRef.push(cell)
+  }
+
+  static createInitialBoard() {
+    return _.range(8).map(y => {
+      return _.range(8).map(x => {
+        let color = 0
+        if ((x == 3 && y == 3) || (x == 4 && y == 4))
+          color = 1
+        if ((x == 3 && y == 4) || (x == 4 && y == 3))
+          color = 2
+        return {
+          x,
+          y,
+          color,
+        }
+      })
+    })
   }
 }
