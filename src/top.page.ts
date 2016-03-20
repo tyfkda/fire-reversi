@@ -16,6 +16,13 @@ import {FirebaseEventPipe} from './firebasepipe'
         {{message.text}}
       </li>
     </ul>
+
+    <div *ngFor="#row of board"
+      ><span *ngFor="#cell of row"
+        ><img [src]="getCellImage(cell)"
+              (click)="onClickCell(cell)"
+      ></span
+    ></div>
     `,
 })
 export class TopPage {
@@ -23,6 +30,8 @@ export class TopPage {
   messagesRef: Firebase
   isLoggedIn: boolean;
   authData: any;
+  board: Array<Array<Object>>
+  turn: Number
 
   constructor() {
     this.firebaseUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/messages'
@@ -33,6 +42,32 @@ export class TopPage {
         this.isLoggedIn = true
       }
     })
+
+    this._ = _
+
+    this.board = _.range(8).map(y => {
+      return _.range(8).map(x => {
+        return {
+          x,
+          y,
+          color: 0,
+        }
+      })
+    })
+    this.turn = 0
+  }
+
+  getCellImage(cell) {
+    switch (cell.color) {
+    case 1:  return 'assets/black.png'
+    case 2:  return 'assets/white.png'
+    default:  return 'assets/empty.png'
+    }
+  }
+
+  onClickCell(cell) {
+    cell.color = this.turn + 1
+    this.turn = 1 - this.turn
   }
 
   authWithTwitter() {
