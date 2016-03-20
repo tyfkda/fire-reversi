@@ -8,14 +8,23 @@ function isValidPos(x, y) {
 @Component({
   pipes: [FirebaseEventPipe],
   template: `
-<h2>Top page</h2>
+<h2>Reversi</h2>
+
+<div class="clearfix">
+  <div class="pull-left">
     <div *ngFor="#row of board"
       ><span *ngFor="#cell of row"
         ><img [src]="getCellImage(cell)"
               (click)="onClickCell(cell)"
       ></span
     ></div>
-{{turn}}
+  </div>
+  <div class="pull-left" style="margin-left: 8px;">
+    Turn: {{turn==0?'Black':'White'}}
+  </div>
+</div>
+
+Footer.
 
     `,
 })

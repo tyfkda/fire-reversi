@@ -7,15 +7,6 @@ import {TopPage} from './top.page'
   selector: 'my-app',
   directives: [ROUTER_DIRECTIVES],
   template: `
-<style>
-nav a.router-link-active {
-  background-color: red;
-}
-</style>
-<nav>
-  <a [routerLink]="['TopPage']">Top</a>
-</nav>
-<hr>
     <router-outlet></router-outlet>
     `,
 })
