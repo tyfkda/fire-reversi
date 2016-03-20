@@ -15,6 +15,8 @@ function isValidPos(x, y) {
               (click)="onClickCell(cell)"
       ></span
     ></div>
+{{turn}}
+
     `,
 })
 export class TopPage {
@@ -30,7 +32,7 @@ export class TopPage {
     this.movesRef = new Firebase(this.movesUrl)
     this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
-      this.putColor(cell.x, cell.y, cell.color)
+      this.putColor(cell.x, cell.y, cell.color, true)
       this.turn = 1 - (cell.color - 1)
     })
 
@@ -40,18 +42,21 @@ export class TopPage {
     this.turn = 0
   }
 
-  putColor(x, y, color) {
-    this.board[y][x].color = color
+  putColor(x, y, color, flip) {
+    let flipped = 0
     for (let i = -1; i <= 1; ++i) {
       for (let j = -1; j <= 1; ++j) {
         if (j == 0 && i == 0)
           continue
-        this.checkReverse(x, y, j, i, color)
+        flipped += this.checkReverse(x, y, j, i, color, flip)
       }
     }
+    if (flip && flipped >= 0)
+      this.board[y][x].color = color
+    return flipped
   }
 
-  checkReverse(x, y, dx, dy, color) {
+  checkReverse(x, y, dx, dy, color, flip) {
     const opponent = 3 - color
     let n = 0
     let xx = x, yy = y
@@ -59,17 +64,21 @@ export class TopPage {
       xx += dx
       yy += dy
       if (!isValidPos(xx, yy))
-        return false
+        return 0
       const c = this.board[yy][xx].color
       if (c != opponent) {
-        if (n <= 0 || c != color)
-          return
-        break
+        if (n > 0 && c == color)
+          break
+        return 0
       }
       ++n
     }
 
     // Can flip!
+
+    if (!flip)
+      return n
+
     xx = x
     yy = y
     for (;;) {
@@ -80,6 +89,7 @@ export class TopPage {
         break
       this.board[yy][xx].color = color
     }
+    return n
   }
 
   getCellImage(cell) {
@@ -93,8 +103,12 @@ export class TopPage {
   onClickCell(cell) {
     if (cell.color != 0)
       return
+    const myColor = this.turn + 1
+    const n = this.putColor(cell.x, cell.y, myColor, false)
+    if (n <= 0)
+      return
 
-    cell.color = this.turn + 1
+    cell.color = myColor
     this.movesRef.push(cell)
   }
 
