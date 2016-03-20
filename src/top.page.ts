@@ -1,6 +1,10 @@
 import {Component} from 'angular2/core'
 import {FirebaseEventPipe} from './firebasepipe'
 
+function isValidPos(x, y) {
+  return x >= 0 && x < 8 && y >= 0 && y < 8
+}
+
 @Component({
   pipes: [FirebaseEventPipe],
   template: `
@@ -38,6 +42,44 @@ export class TopPage {
 
   putColor(x, y, color) {
     this.board[y][x].color = color
+    for (let i = -1; i <= 1; ++i) {
+      for (let j = -1; j <= 1; ++j) {
+        if (j == 0 && i == 0)
+          continue
+        this.checkReverse(x, y, j, i, color)
+      }
+    }
+  }
+
+  checkReverse(x, y, dx, dy, color) {
+    const opponent = 3 - color
+    let n = 0
+    let xx = x, yy = y
+    for (;;) {
+      xx += dx
+      yy += dy
+      if (!isValidPos(xx, yy))
+        return false
+      const c = this.board[yy][xx].color
+      if (c != opponent) {
+        if (n <= 0 || c != color)
+          return
+        break
+      }
+      ++n
+    }
+
+    // Can flip!
+    xx = x
+    yy = y
+    for (;;) {
+      xx += dx
+      yy += dy
+      const c = this.board[yy][xx].color
+      if (c != opponent)
+        break
+      this.board[yy][xx].color = color
+    }
   }
 
   getCellImage(cell) {
