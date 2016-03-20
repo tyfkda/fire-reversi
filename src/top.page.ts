@@ -1,14 +1,21 @@
 import {Component} from 'angular2/core'
+import {FirebaseEventPipe} from './firebasepipe'
 
 @Component({
+  pipes: [FirebaseEventPipe],
   template: `
 <h2>Top page</h2>
     <div>
       <button [hidden]="isLoggedIn" class="twitter" (click)="authWithTwitter()">Sign in with Twitter</button>
     </div>
     <div class="message-input">
-      <input [hidden]="!isLoggedIn" #messagetext (keyup)="doneTyping($event)" placeholder="Enter a message...">
+      <input #messagetext (keyup)="doneTyping($event)" placeholder="Enter a message...">
     </div>
+    <ul class="messages-list">
+      <li *ngFor="#message of firebaseUrl | firebaseevent:'child_added'">
+        <strong>{{message.name}}</strong>: {{message.text}}
+      </li>
+    </ul>
     `,
 })
 export class TopPage {
@@ -33,6 +40,21 @@ export class TopPage {
     this.messagesRef.authWithOAuthPopup('twitter', (error) => {
       if (error)
 	console.error(error)
+    })
+  }
+
+  doneTyping($event) {
+    if ($event.which === 13) {
+      this.addMessage($event.target.value)
+      $event.target.value = null
+    }
+  }
+
+  addMessage(message: string) {
+    var newString = message
+    this.messagesRef.push({
+      name: this.authData.twitter.username,
+      text: newString
     })
   }
 }
