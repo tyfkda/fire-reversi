@@ -13,7 +13,7 @@ import {FirebaseEventPipe} from './firebasepipe'
     </div>
     <ul class="messages-list">
       <li *ngFor="#message of firebaseUrl | firebaseevent:'child_added'">
-        <strong>{{message.name}}</strong>: {{message.text}}
+        {{message.text}}
       </li>
     </ul>
     `,
@@ -28,7 +28,6 @@ export class TopPage {
     this.firebaseUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/messages'
     this.messagesRef = new Firebase(this.firebaseUrl)
     this.messagesRef.onAuth((user) => {
-      console.log(user)
       if (user) {
         this.authData = user
         this.isLoggedIn = true
@@ -45,15 +44,16 @@ export class TopPage {
 
   doneTyping($event) {
     if ($event.which === 13) {
-      this.addMessage($event.target.value)
-      $event.target.value = null
+      if ($event.target.value != '') {
+        this.addMessage($event.target.value)
+        $event.target.value = ''
+      }
     }
   }
 
   addMessage(message: string) {
     var newString = message
     this.messagesRef.push({
-      name: this.authData.twitter.username,
       text: newString
     })
   }
