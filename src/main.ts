@@ -4,8 +4,8 @@ import {ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2
 
 import {App} from './app'
 
-import {enableProdMode} from 'angular2/core';
-enableProdMode();
+import {enableProdMode} from 'angular2/core'
+enableProdMode()
 
 bootstrap(App, [
   ROUTER_PROVIDERS,
