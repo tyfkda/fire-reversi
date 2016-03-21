@@ -24,15 +24,8 @@
     <script src="https://cdn.firebase.com/js/client/2.4.1/firebase.js"></script>
 
     <!-- 2. Configure SystemJS -->
+    <script src="src/config.js"></script>
     <script>
-      System.config({
-        packages: {
-          app: {
-            format: 'register',
-            defaultExtension: 'js'
-          }
-        }
-      });
       System.import('app/main')
         .then(null, console.error.bind(console));
     </script>
