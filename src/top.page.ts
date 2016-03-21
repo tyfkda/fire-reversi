@@ -2,7 +2,8 @@ import {Component} from 'angular2/core'
 import {FirebaseEventPipe} from './firebasepipe'
 import _ from 'lodash'
 
-declare var Firebase: any
+/// <reference path="../typings/main/definition/lodash/index.d.ts" />
+/// <reference path="../typings/main/ambient/firebase/index.d.ts" />
 
 function isValidPos(x, y) {
   return x >= 0 && x < 8 && y >= 0 && y < 8
