@@ -5,6 +5,11 @@ function isValidPos(x, y) {
   return x >= 0 && x < 8 && y >= 0 && y < 8
 }
 
+class Cell {
+  constructor(public x: number, public y: number, public color: number) {
+  }
+}
+
 @Component({
   pipes: [FirebaseEventPipe],
   template: `
@@ -41,7 +46,7 @@ export class TopPage {
   movesRef: Firebase
   isLoggedIn: boolean
   authData: any
-  board: Array<Array<Object>>
+  board: Array<Array<Cell>>
   turn: number
   colorCount: Array<number>
   gameOver: boolean
@@ -153,7 +158,7 @@ export class TopPage {
     this.movesRef.push(cell)
   }
 
-  static createInitialBoard() {
+  static createInitialBoard(): Array<Array<Cell>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
         let color = 0
