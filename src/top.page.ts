@@ -22,7 +22,7 @@ function isValidPos(x, y) {
   <div class="pull-left" style="margin-left: 8px;">
     <div>Turn: {{turn==0?'Black':'White'}}</div>
     <br>
-    <div>Black:#{{circleCount[0]}}, White:{{circleCount[1]}}</div>
+    <div>Black:#{{colorCount[0]}}, White:{{colorCount[1]}}</div>
     <br>
     <div [hidden]="!gameOver">
       <div [hidden]="winPlayer!=1">BLACK win!</div>
@@ -43,7 +43,7 @@ export class TopPage {
   authData: any
   board: Array<Array<Object>>
   turn: number
-  circleCount: Array<number>
+  colorCount: Array<number>
   gameOver: boolean
   winPlayer: number
 
@@ -59,7 +59,7 @@ export class TopPage {
     this._ = _
 
     this.board = TopPage.createInitialBoard()
-    this.circleCount = [2, 2]
+    this.colorCount = [2, 2]
     this.turn = 0
     this.gameOver = false
     this.winPlayer = -1
@@ -76,21 +76,21 @@ export class TopPage {
     }
     if (flip && flipped >= 0) {
       this.board[y][x].color = color
-      this.circleCount[color - 1] += flipped + 1
-      this.circleCount[2 - color] -= flipped
+      this.colorCount[color - 1] += flipped + 1
+      this.colorCount[2 - color] -= flipped
       this.checkGameOver()
     }
     return flipped
   }
 
   checkGameOver() {
-    if ((this.circleCount[0] + this.circleCount[1] >= 64) ||  // Full.
-        (this.circleCount[0] == 0) ||
-        (this.circleCount[1] == 0)) {
+    if ((this.colorCount[0] + this.colorCount[1] >= 64) ||  // Full.
+        (this.colorCount[0] == 0) ||
+        (this.colorCount[1] == 0)) {
       this.gameOver = true
-      if (this.circleCount[0] > this.circleCount[1])
+      if (this.colorCount[0] > this.colorCount[1])
         this.winPlayer = 1
-      else if (this.circleCount[0] < this.circleCount[1])
+      else if (this.colorCount[0] < this.colorCount[1])
         this.winPlayer = 2
       else
         this.winPlayer = 0  // draw
