@@ -39,12 +39,12 @@ Footer.
 export class TopPage {
   movesUrl: string
   movesRef: Firebase
-  isLoggedIn: boolean;
-  authData: any;
+  isLoggedIn: boolean
+  authData: any
   board: Array<Array<Object>>
   turn: number
   circleCount: Array<number>
-  gameOver: boolearn
+  gameOver: boolean
   winPlayer: number
 
   constructor() {
