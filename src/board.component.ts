@@ -1,4 +1,4 @@
-import {Component, Input} from 'angular2/core'
+import {Component, Input, Output, EventEmitter} from 'angular2/core'
 import {FirebaseEventPipe} from './firebasepipe'
 import _ from 'lodash'
 
@@ -20,8 +20,7 @@ import {Board, Cell} from './board'
 })
 export class BoardComponent {
   @Input() board: Board
-  @Input() movesRef: Firebase
-  @Input() cellClicked: any
+  @Output() cellClicked = new EventEmitter()
 
   getCellImage(cell) {
     switch (cell.color) {
@@ -40,6 +39,6 @@ export class BoardComponent {
       return
 
     cell.color = myColor
-    this.cellClicked(cell)
+    this.cellClicked.emit(cell)
   }
 }

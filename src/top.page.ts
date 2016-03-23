@@ -15,8 +15,7 @@ import {Board} from './board'
 <div class="clearfix">
   <div class="pull-left">
     <board [board]="board"
-           [movesRef]="movesRef"
-           [cellClicked]="cellClicked"></board>
+           (cellClicked)="cellClicked($event)"></board>
   </div>
   <div class="pull-left" style="margin-left: 8px;">
     <div>Turn: {{board.turn==0?'Black':'White'}}</div>
