@@ -20,7 +20,7 @@ import {Board} from './board'
   <div class="pull-left" style="margin-left: 8px;">
     <div>Turn: {{board.turn==0?'Black':'White'}}</div>
     <br>
-    <div>Black:#{{board.colorCount[0]}}, White:{{board.colorCount[1]}}</div>
+    <div>Black:#{{board.stoneCount[0]}}, White:{{board.stoneCount[1]}}</div>
     <br>
     <div [hidden]="!board.gameOver">
       <div [hidden]="board.winPlayer!=1">BLACK win!</div>
@@ -46,7 +46,7 @@ export class TopPage {
     this.movesRef = new Firebase(this.movesUrl)
     this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
-      const n = this.board.putColor(cell.x, cell.y, cell.color)
+      const n = this.board.putStone(cell.x, cell.y, cell.stone)
     })
 
     this.board = new Board()

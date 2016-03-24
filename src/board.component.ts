@@ -23,7 +23,7 @@ export class BoardComponent {
   @Output() cellClicked = new EventEmitter()
 
   getCellImage(cell) {
-    switch (cell.color) {
+    switch (cell.stone) {
     case 1:  return 'assets/black.png'
     case 2:  return 'assets/white.png'
     default:  return 'assets/empty.png'
@@ -31,14 +31,14 @@ export class BoardComponent {
   }
 
   onClickCell(cell) {
-    if (cell.color != 0)
+    if (cell.stone != 0)
       return
-    const myColor = this.board.turn + 1
-    const n = this.board.canPut(cell.x, cell.y, myColor)
+    const myStone = this.board.turn + 1
+    const n = this.board.canPut(cell.x, cell.y, myStone)
     if (n <= 0)
       return
 
-    cell.color = myColor
+    cell.stone = myStone
     this.cellClicked.emit(cell)
   }
 }

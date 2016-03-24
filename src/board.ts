@@ -5,7 +5,7 @@ function isValidPos(x, y) {
 }
 
 export class Cell {
-  constructor(public x: number, public y: number, public color: number) {
+  constructor(public x: number, public y: number, public stone: number) {
   }
 }
 
@@ -14,47 +14,47 @@ export class Board {
   public turn: number
   public gameOver: boolean
   public winPlayer: number
-  colorCount: Array<number>
+  stoneCount: Array<number>
 
   constructor() {
     this.board = Board.createInitialBoard()
     this.turn = 0
     this.gameOver = false
     this.winPlayer = -1
-    this.colorCount = [2, 2]
+    this.stoneCount = [2, 2]
   }
 
-  // Returns whether the color can put the location, and flip-able count
-  canPut(x, y, color) {
-    return this.doPutColor(x, y, color, false)
+  // Returns whether the stone can put the location, and flip-able count
+  canPut(x, y, stone) {
+    return this.doPutStone(x, y, stone, false)
   }
 
-  putColor(x, y, color) {
-    return this.doPutColor(x, y, color, true)
+  putStone(x, y, stone) {
+    return this.doPutStone(x, y, stone, true)
   }
 
-  private doPutColor(x, y, color, flip) {
+  private doPutStone(x, y, stone, flip) {
     let flipped = 0
     for (let i = -1; i <= 1; ++i) {
       for (let j = -1; j <= 1; ++j) {
         if (j == 0 && i == 0)
           continue
-        flipped += this.checkReverse(x, y, j, i, color, flip)
+        flipped += this.checkReverse(x, y, j, i, stone, flip)
       }
     }
     if (flip && flipped >= 0) {
-      this.board[y][x].color = color
-      this.colorCount[color - 1] += flipped + 1
-      this.colorCount[2 - color] -= flipped
+      this.board[y][x].stone = stone
+      this.stoneCount[stone - 1] += flipped + 1
+      this.stoneCount[2 - stone] -= flipped
       this.checkGameOver()
 
-      this.turn = 1 - (color - 1)
+      this.turn = 1 - (stone - 1)
     }
     return flipped
   }
 
-  checkReverse(x, y, dx, dy, color, flip) {
-    const opponent = 3 - color
+  checkReverse(x, y, dx, dy, stone, flip) {
+    const opponent = 3 - stone
     let n = 0
     let xx = x, yy = y
     for (;;) {
@@ -62,9 +62,9 @@ export class Board {
       yy += dy
       if (!isValidPos(xx, yy))
         return 0
-      const c = this.board[yy][xx].color
+      const c = this.board[yy][xx].stone
       if (c != opponent) {
-        if (n > 0 && c == color)
+        if (n > 0 && c == stone)
           break
         return 0
       }
@@ -81,22 +81,22 @@ export class Board {
     for (;;) {
       xx += dx
       yy += dy
-      const c = this.board[yy][xx].color
+      const c = this.board[yy][xx].stone
       if (c != opponent)
         break
-      this.board[yy][xx].color = color
+      this.board[yy][xx].stone = stone
     }
     return n
   }
 
   checkGameOver() {
-    if ((this.colorCount[0] + this.colorCount[1] >= 64) ||  // Full.
-        (this.colorCount[0] == 0) ||
-        (this.colorCount[1] == 0)) {
+    if ((this.stoneCount[0] + this.stoneCount[1] >= 64) ||  // Full.
+        (this.stoneCount[0] == 0) ||
+        (this.stoneCount[1] == 0)) {
       this.gameOver = true
-      if (this.colorCount[0] > this.colorCount[1])
+      if (this.stoneCount[0] > this.stoneCount[1])
         this.winPlayer = 1
-      else if (this.colorCount[0] < this.colorCount[1])
+      else if (this.stoneCount[0] < this.stoneCount[1])
         this.winPlayer = 2
       else
         this.winPlayer = 0  // draw
@@ -106,15 +106,15 @@ export class Board {
   static createInitialBoard(): Array<Array<Cell>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
-        let color = 0
+        let stone = 0
         if ((x == 3 && y == 3) || (x == 4 && y == 4))
-          color = 1
+          stone = 1
         if ((x == 3 && y == 4) || (x == 4 && y == 3))
-          color = 2
+          stone = 2
         return {
           x,
           y,
-          color,
+          stone,
         }
       })
     })
