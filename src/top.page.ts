@@ -46,7 +46,7 @@ export class TopPage {
     this.movesRef = new Firebase(this.movesUrl)
     this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
-      const n = this.board.putColor(cell.x, cell.y, cell.color, true)
+      const n = this.board.putColor(cell.x, cell.y, cell.color)
     })
 
     this.board = new Board()

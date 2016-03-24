@@ -24,7 +24,16 @@ export class Board {
     this.colorCount = [2, 2]
   }
 
-  putColor(x, y, color, flip) {
+  // Returns whether the color can put the location, and flip-able count
+  canPut(x, y, color) {
+    return this.doPutColor(x, y, color, false)
+  }
+
+  putColor(x, y, color) {
+    return this.doPutColor(x, y, color, true)
+  }
+
+  private doPutColor(x, y, color, flip) {
     let flipped = 0
     for (let i = -1; i <= 1; ++i) {
       for (let j = -1; j <= 1; ++j) {

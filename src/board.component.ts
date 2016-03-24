@@ -34,7 +34,7 @@ export class BoardComponent {
     if (cell.color != 0)
       return
     const myColor = this.board.turn + 1
-    const n = this.board.putColor(cell.x, cell.y, myColor, false)
+    const n = this.board.canPut(cell.x, cell.y, myColor)
     if (n <= 0)
       return
 
