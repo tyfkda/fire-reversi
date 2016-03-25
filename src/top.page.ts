@@ -7,75 +7,96 @@ import {Board, Stone} from './board'
 
 /// <reference path="../typings/main/ambient/firebase/index.d.ts" />
 
-enum PlayingState {
+enum PlayerState {
   WATCHING,
   JOINING,
   PLAYING,
 }
 
-export class Player {
-  online = false
-
-  constructor(private playerRef: Firebase) {
-  }
-
-  setOnline(val) {
-    this.online = !!val
-  }
-}
-
 export class GameController {
-  players: Array<Player>
-  playingState: PlayingState
+  public playerId: number
+  public playerState: PlayerState
+  public board: Board
+
+  private onlinePlayersRef: Firebase
+  private onlinePlayers: number
 
   constructor(private reversiRef: Firebase) {
-    this.players = _.range(2).map(i => new Player(
-      this.reversiRef.child(`player${i}`)))
-    this.playingState = PlayingState.WATCHING
-    this.waitToJoin()
+    this.playerId = -1
+    this.playerState = PlayerState.WATCHING
+    this.onlinePlayers = -1
+    this.board = new Board()
+
+    this.watchOnlinePlayers()
   }
 
-  waitToJoin() {
-    for (let i = 0; i < 2; ++i) {
-      this.reversiRef.child(`player${i}/online`).on('value', onlineSnap => {
-        const val = onlineSnap.val()
-        console.log(`player${i}/online = ${val}`)
-        this.players[i].setOnline(val)
-        if (val === null && this.playingState == PlayingState.WATCHING) {
-          this.tryToJoin(i)
-        }
-      })
+  isEnableLogin() {
+    return (this.onlinePlayers >= 0 && this.onlinePlayers < 3) &&
+      this.playerState == PlayerState.WATCHING
+  }
+
+  login() {
+    if (!this.isEnableLogin())
+      return
+
+    this.playerState = PlayerState.JOINING
+    const f = (i) => {
+      this.tryToJoin(i)
+        .then(() => {
+          this.startPlaying(i)
+        })
+        .catch(() => {
+          if (++i < 2)
+            return f(i)
+          console.error('Login failed')
+          this.playerState = PlayerState.WATCHING
+        })
     }
+    f(0)
+  }
+
+  watchOnlinePlayers() {
+    this.onlinePlayersRef = this.reversiRef.child('onlinePlayers')
+    this.onlinePlayersRef.on('value', onlineSnap => {
+      let val = onlineSnap.val() || 0
+      console.log(`onlinePlayers=${val}, playerState=${this.playerState}`)
+      this.onlinePlayers = val
+    })
   }
 
   /**
    * Try to join the game as the specified playerNum.
    */
   tryToJoin(playerNum) {
-    console.log(`tryToJoin: as ${playerNum}`)
-    this.playingState = PlayingState.JOINING
-    this.reversiRef.child(`player${playerNum}/online`).transaction(onlineVal => {
-      if (onlineVal === null) {
-        return true  // Try to set online to true.
-      } else {
-        return  // Somebody must have beat us. Abort the transaction.
-      }
-    }, (error, committed) => {
+    return new Promise((resolve, reject) => {
+console.log(`tryToJoin: as ${playerNum}`)
+      this.reversiRef.child('onlinePlayers').transaction(onlineVal => {
+        const val = onlineVal || 0
+        const bit = 1 << playerNum
+        if ((val & (1 << playerNum)) == 0) {
+          return (val | bit)  // Try to set online to true.
+        } else {
+          return  // Somebody must have beat us. Abort the transaction.
+        }
+      }, (error, committed) => {
 console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
-      if (committed) {  // We got in!
-        this.playingState = PlayingState.PLAYING
-        this.startPlaying(playerNum)
-      } else {
-        this.playingState = PlayingState.WATCHING
-      }
+        if (committed) {  // We got in!
+          resolve()
+        } else {
+          reject()
+        }
+      })
     })
   }
 
   /**
    * Once we've joined, enable controlling our player.
    */
-  startPlaying(playerNum) {
-    console.log(`startPlaying ${playerNum}`)
+  startPlaying(playerId) {
+    console.log(`startPlaying ${playerId}`)
+    this.playerId = playerId
+    this.playerState = PlayerState.PLAYING
+    this.board.startGame()
   }
 }
 
@@ -90,6 +111,13 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
            (cellClicked)="cellClicked($event)"></board>
   </div>
   <div class="pull-left" style="margin-left: 8px;">
+    <div>PlayerId: {{gameController.playerId}}</div>
+    <div>OnlinePlayers: {{gameController.onlinePlayers}}
+      <input [hidden]="!isEnableLogin()" type="button"
+             (click)="login()"
+             value="Login">
+    </div>
+
     <div [hidden]="board.gameOver">Turn: {{board.turn==1?'Black':'White'}}</div>
     <div [hidden]="!board.gameOver">
       <div [hidden]="board.winPlayer!=1">BLACK win!</div>
@@ -110,7 +138,6 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
 export class TopPage {
   reversiUrl: string
   reversiRef: Firebase
-  board: Board
   gameController: GameController
 
   constructor() {
@@ -124,8 +151,19 @@ export class TopPage {
     */
 
     this.gameController = new GameController(this.reversiRef)
+  }
 
-    this.board = new Board()
+  get board() {
+    return this.gameController.board
+  }
+
+  isEnableLogin() {
+    return this.gameController.isEnableLogin()
+  }
+
+  login() {
+    console.log('login clicked')
+    this.gameController.login()
   }
 
   cellClicked(cell) {

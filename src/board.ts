@@ -29,11 +29,20 @@ export class Board {
   stoneCount: Array<number>
 
   constructor() {
-    this.reset()
+    this.clear()
   }
 
-  reset() {
-    this.board = Board.createInitialBoard()
+  clear() {
+    this.board = Board.createInitialBoard(false)
+    this.turn = Stone.BLACK
+    this.gameOver = true
+    this.winPlayer = -1
+    this.stoneCount = []
+    this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 0
+  }
+
+  startGame() {
+    this.board = Board.createInitialBoard(true)
     this.turn = Stone.BLACK
     this.gameOver = false
     this.winPlayer = -1
@@ -143,17 +152,19 @@ export class Board {
     return handCount
   }
 
-  static createInitialBoard(): Array<Array<Cell>> {
+  static createInitialBoard(flag: boolean): Array<Array<Cell>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
         let stone = Stone.EMPTY
-        if ((x == 3 && y == 3) || (x == 4 && y == 4))
-          stone = Stone.BLACK
-        if ((x == 3 && y == 4) || (x == 4 && y == 3))
-          stone = Stone.WHITE
+        if (flag) {
+          if ((x == 3 && y == 3) || (x == 4 && y == 4))
+            stone = Stone.BLACK
+          if ((x == 3 && y == 4) || (x == 4 && y == 3))
+            stone = Stone.WHITE
+        }
         return {
           stone,
-          canPut: stone == Stone.EMPTY,
+          canPut: false,
         }
       })
     })
