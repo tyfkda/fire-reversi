@@ -18,15 +18,15 @@ import {Board, Stone} from './board'
            (cellClicked)="cellClicked($event)"></board>
   </div>
   <div class="pull-left" style="margin-left: 8px;">
-    <div>Turn: {{board.turn==1?'Black':'White'}}</div>
-    <br>
-    <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
-    <br>
+    <div [hidden]="board.gameOver">Turn: {{board.turn==1?'Black':'White'}}</div>
     <div [hidden]="!board.gameOver">
       <div [hidden]="board.winPlayer!=1">BLACK win!</div>
       <div [hidden]="board.winPlayer!=2">WHITE win!</div>
       <div [hidden]="board.winPlayer!=0">draw</div>
     </div>
+    <br>
+    <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
+    <br>
   </div>
 </div>
 

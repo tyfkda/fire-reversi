@@ -16,8 +16,13 @@ export module Stone {
   }
 }
 
+export class Cell {
+  stone: Stone
+  canPut: boolean
+}
+
 export class Board {
-  public board: Array<Array<Stone>>
+  public board: Array<Array<Cell>>
   public turn: Stone
   public gameOver: boolean
   public winPlayer: Stone
@@ -30,6 +35,7 @@ export class Board {
     this.winPlayer = -1
     this.stoneCount = []
     this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 2
+    this.scanBoard()
   }
 
   // Returns whether the stone can put the location, and flip-able count
@@ -51,12 +57,20 @@ export class Board {
       }
     }
     if (flip && flipped >= 0) {
-      this.board[y][x] = stone
+      this.board[y][x].stone = stone
       this.stoneCount[stone] += flipped + 1
       this.stoneCount[Stone.opposite(stone)] -= flipped
       this.checkGameOver()
-
-      this.turn = Stone.opposite(stone)
+      if (!this.gameOver) {
+        this.turn = Stone.opposite(stone)
+        if (this.scanBoard() <= 0) {  // Cannot put!
+          this.turn = stone
+          const n = this.scanBoard()
+          if (n <= 0) {
+            console.error(`Something wrong: cannot put both player`)
+          }
+        }
+      }
     }
     return flipped
   }
@@ -70,7 +84,7 @@ export class Board {
       yy += dy
       if (!Board.isValidPos(xx, yy))
         return 0
-      const s = this.board[yy][xx]
+      const s = this.board[yy][xx].stone
       if (s != opponent) {
         if (n > 0 && s == stone)
           break
@@ -89,10 +103,10 @@ export class Board {
     for (;;) {
       xx += dx
       yy += dy
-      const s = this.board[yy][xx]
+      const s = this.board[yy][xx].stone
       if (s != opponent)
         break
-      this.board[yy][xx] = stone
+      this.board[yy][xx].stone = stone
     }
     return n
   }
@@ -111,7 +125,18 @@ export class Board {
     }
   }
 
-  static createInitialBoard(): Array<Array<Stone>> {
+  scanBoard(): number {
+    let handCount = 0
+    this.board.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        cell.canPut = this.canPut(j, i, this.turn)
+        handCount += cell.canPut ? 1 : 0
+      })
+    })
+    return handCount
+  }
+
+  static createInitialBoard(): Array<Array<Cell>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
         let stone = Stone.EMPTY
@@ -119,7 +144,10 @@ export class Board {
           stone = Stone.BLACK
         if ((x == 3 && y == 4) || (x == 4 && y == 3))
           stone = Stone.WHITE
-        return stone
+        return {
+          stone,
+          canPut: stone == Stone.EMPTY,
+        }
       })
     })
   }

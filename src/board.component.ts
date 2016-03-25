@@ -7,9 +7,15 @@ import {Board, Stone} from './board'
 @Component({
   selector: 'board',
   template: `
+<style>
+  .canPut {
+    cursor: pointer;
+  }
+</style>
 <div *ngFor="#row of board.board, #i=index"
   ><span *ngFor="#cell of row, #j=index"
     ><img [src]="getCellImage(j, i)"
+          [class.canPut]="canPut(j, i)"
           (click)="onClickCell(j, i)"
   ></span
 ></div>
@@ -20,17 +26,24 @@ export class BoardComponent {
   @Output() cellClicked = new EventEmitter()
 
   getCellImage(x: number, y: number) {
-    const stone = this.board.board[y][x]
-    switch (stone) {
+    const cell = this.board.board[y][x]
+    switch (cell.stone) {
     case Stone.BLACK:  return 'assets/black.png'
     case Stone.WHITE:  return 'assets/white.png'
-    case Stone.EMPTY:  return 'assets/empty.png'
+    case Stone.EMPTY:
+      if (!cell.canPut)
+        return 'assets/empty.png'
+      return this.board.turn == Stone.BLACK ? 'assets/canput_black.png' :  'assets/canput_white.png'
     default:  return null
     }
   }
 
+  canPut(x: number, y: number) {
+    return this.board.board[y][x].canPut
+  }
+
   onClickCell(x: number, y: number) {
-    if (this.board.board[y][x] != Stone.EMPTY)
+    if (this.board.board[y][x].stone != Stone.EMPTY)
       return
     const stone = this.board.turn
     const n = this.board.canPut(x, y, stone)
