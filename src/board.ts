@@ -33,7 +33,7 @@ export class Board {
   }
 
   // Returns whether the stone can put the location, and flip-able count
-  canPut(x: number, y: number, stone: Stone) {
+  canPut(x: number, y: number, stone: Stone): number {
     return this.doPutStone(x, y, stone, false)
   }
 
@@ -41,7 +41,7 @@ export class Board {
     return this.doPutStone(x, y, stone, true)
   }
 
-  private doPutStone(x: number, y: number, stone: Stone, flip: boolean) {
+  private doPutStone(x: number, y: number, stone: Stone, flip: boolean): number {
     let flipped = 0
     for (let i = -1; i <= 1; ++i) {
       for (let j = -1; j <= 1; ++j) {
@@ -61,7 +61,7 @@ export class Board {
     return flipped
   }
 
-  checkReverse(x: number, y: number, dx: number, dy: number, stone: Stone, flip: boolean) {
+  checkReverse(x: number, y: number, dx: number, dy: number, stone: Stone, flip: boolean): number {
     const opponent = Stone.opposite(stone)
     let n = 0
     let xx = x, yy = y
@@ -97,7 +97,7 @@ export class Board {
     return n
   }
 
-  checkGameOver() {
+  checkGameOver(): void {
     if ((this.stoneCount[Stone.BLACK] + this.stoneCount[Stone.WHITE] >= 64) ||  // Full.
         (this.stoneCount[Stone.BLACK] == 0) ||
         (this.stoneCount[Stone.WHITE] == 0)) {
