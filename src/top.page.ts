@@ -28,7 +28,9 @@ export class GameController {
   private onlinePlayers: number
 
   private actionRef: Firebase
+  private actionRefHandler: any
   private movesRef: Firebase
+  private movesRefHandler: any
 
   constructor(private reversiRef: Firebase) {
     this.playerId = -1
@@ -37,6 +39,28 @@ export class GameController {
     this.board = new Board()
 
     this.watchOnlinePlayers()
+  }
+
+  reset() {
+    this.board.clear()
+    this.finishGame()
+  }
+
+  finishGame() {
+    if (this.actionRef && this.actionRefHandler) {
+      this.actionRef.off('value', this.actionRefHandler)
+      this.actionRef = null
+      this.actionRefHandler = null
+    }
+    if (this.movesRef && this.movesRefHandler) {
+      this.movesRef.off('child_added', this.movesRefHandler)
+      this.movesRef = null
+      this.movesRefHandler = null
+    }
+    this.onlinePlayersRef.remove()
+    this.reversiRef.child('action').remove()
+    this.reversiRef.child('moves').remove()
+    this.playerState = PlayerState.WATCHING
   }
 
   isEnableLogin() {
@@ -48,6 +72,7 @@ export class GameController {
     if (!this.isEnableLogin())
       return
 
+    this.playerId = -1
     this.playerState = PlayerState.JOINING
     const f = (i) => {
       this.tryToJoin(i)
@@ -120,7 +145,7 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
 
   watchAction() {
     this.actionRef = this.reversiRef.child('action')
-    this.actionRef.on('value', onlineSnap => {
+    this.actionRefHandler = this.actionRef.on('value', onlineSnap => {
       const val = onlineSnap.val()
       console.log('Action:')
       console.log(val)
@@ -143,10 +168,13 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
 
   watchMoves() {
     this.movesRef = this.reversiRef.child('moves')
-    this.movesRef.on('child_added', (snapshot) => {
+    this.movesRefHandler = this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
       console.log(cell)
-      const n = this.board.putStone(cell.x, cell.y, cell.stone)
+      this.board.putStone(cell.x, cell.y, cell.stone)
+      if (this.board.gameOver) {
+        this.finishGame()
+      }
     })
   }
 
@@ -202,12 +230,6 @@ export class TopPage {
   constructor() {
     this.reversiUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/'
     this.reversiRef = new Firebase(this.reversiUrl)
-    /*
-    this.movesRef.on('child_added', (snapshot) => {
-      const cell = snapshot.val()
-      const n = this.board.putStone(cell.x, cell.y, cell.stone)
-    })
-    */
 
     this.gameController = new GameController(this.reversiRef)
   }
@@ -230,7 +252,6 @@ export class TopPage {
   }
 
   reset() {
-    //this.board.reset()
-    //this.movesRef.remove()
+    this.gameController.reset()
   }
 }
