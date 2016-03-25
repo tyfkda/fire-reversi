@@ -18,7 +18,7 @@ import {Board, Stone} from './board'
            (cellClicked)="cellClicked($event)"></board>
   </div>
   <div class="pull-left" style="margin-left: 8px;">
-    <div>Turn: {{board.turn==0?'Black':'White'}}</div>
+    <div>Turn: {{board.turn==1?'Black':'White'}}</div>
     <br>
     <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
     <br>
