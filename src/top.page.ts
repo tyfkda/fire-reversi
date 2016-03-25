@@ -38,8 +38,6 @@ export class TopPage {
   movesUrl: string
   movesRef: Firebase
   board: Board
-  isLoggedIn: boolean
-  authData: any
 
   constructor() {
     this.movesUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/movess'
