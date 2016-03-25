@@ -30,8 +30,7 @@ export class BoardComponent {
   }
 
   onClickCell(x: number, y: number) {
-    const stone = this.board.board[y][x]
-    if (stone != Stone.EMPTY)
+    if (this.board.board[y][x] != Stone.EMPTY)
       return
     const stone = this.board.turn
     const n = this.board.canPut(x, y, stone)
