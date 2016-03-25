@@ -30,8 +30,9 @@ import {Board, Stone} from './board'
   </div>
 </div>
 
-Footer.
-
+<input type="button"
+       (click)="reset()"
+       value="Reset">
     `,
 })
 export class TopPage {
@@ -52,5 +53,10 @@ export class TopPage {
 
   cellClicked(cell) {
     this.movesRef.push(cell)
+  }
+
+  reset() {
+    this.board.reset()
+    this.movesRef.remove()
   }
 }

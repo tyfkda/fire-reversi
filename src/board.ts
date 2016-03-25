@@ -29,6 +29,10 @@ export class Board {
   stoneCount: Array<number>
 
   constructor() {
+    this.reset()
+  }
+
+  reset() {
     this.board = Board.createInitialBoard()
     this.turn = Stone.BLACK
     this.gameOver = false
