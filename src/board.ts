@@ -52,6 +52,9 @@ export class Board {
   }
 
   private doPutStone(x: number, y: number, stone: Stone, flip: boolean): number {
+    if (this.board[y][x].stone != Stone.EMPTY)
+      return 0
+
     let flipped = 0
     for (let i = -1; i <= 1; ++i) {
       for (let j = -1; j <= 1; ++j) {
