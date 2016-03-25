@@ -136,7 +136,7 @@ export class Board {
     let handCount = 0
     this.board.forEach((row, i) => {
       row.forEach((cell, j) => {
-        cell.canPut = this.canPut(j, i, this.turn)
+        cell.canPut = this.canPut(j, i, this.turn) > 0
         handCount += cell.canPut ? 1 : 0
       })
     })
