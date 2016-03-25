@@ -1,4 +1,4 @@
-/// <reference path="../typings/main/definition/lodash/index.d.ts" />
+import _ from 'lodash'
 
 function isValidPos(x, y) {
   return x >= 0 && x < 8 && y >= 0 && y < 8

@@ -4,9 +4,6 @@ import _ from 'lodash'
 
 import {Board, Cell} from './board'
 
-/// <reference path="../typings/main/definition/lodash/index.d.ts" />
-/// <reference path="../typings/main/ambient/firebase/index.d.ts" />
-
 @Component({
   selector: 'board',
   template: `
