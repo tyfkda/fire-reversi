@@ -10,7 +10,13 @@ import {Board, Stone} from './board'
 enum PlayerState {
   WATCHING,
   JOINING,
+  WAITING_OTHERS,
   PLAYING,
+}
+
+enum Action {
+  NONE,
+  PUT,
 }
 
 export class GameController {
@@ -20,6 +26,9 @@ export class GameController {
 
   private onlinePlayersRef: Firebase
   private onlinePlayers: number
+
+  private actionRef: Firebase
+  private movesRef: Firebase
 
   constructor(private reversiRef: Firebase) {
     this.playerId = -1
@@ -43,7 +52,9 @@ export class GameController {
     const f = (i) => {
       this.tryToJoin(i)
         .then(() => {
-          this.startPlaying(i)
+          this.playerId = i
+          this.playerState = PlayerState.WAITING_OTHERS
+          this.tryStartGame()
         })
         .catch(() => {
           if (++i < 2)
@@ -59,8 +70,10 @@ export class GameController {
     this.onlinePlayersRef = this.reversiRef.child('onlinePlayers')
     this.onlinePlayersRef.on('value', onlineSnap => {
       let val = onlineSnap.val() || 0
-      console.log(`onlinePlayers=${val}, playerState=${this.playerState}`)
+      console.log(`onlinePlayers=${val}, playerState=${this.playerState}, playerId=${this.playerId}`)
       this.onlinePlayers = val
+
+      this.tryStartGame()
     })
   }
 
@@ -92,11 +105,56 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
   /**
    * Once we've joined, enable controlling our player.
    */
-  startPlaying(playerId) {
-    console.log(`startPlaying ${playerId}`)
-    this.playerId = playerId
+  tryStartGame() {
+    if (this.onlinePlayers != 3 || this.playerId < 0)
+      return
+    this.startGame()
+  }
+  startGame() {
     this.playerState = PlayerState.PLAYING
-    this.board.startGame()
+    this.board.startGame(this.playerId)
+
+    this.watchAction()
+    this.watchMoves()
+  }
+
+  watchAction() {
+    this.actionRef = this.reversiRef.child('action')
+    this.actionRef.on('value', onlineSnap => {
+      const val = onlineSnap.val()
+      console.log('Action:')
+      console.log(val)
+      if (val == null)
+        return
+      switch (val.action) {
+      case Action.PUT:
+        if (!this.board.isTurn &&
+            val.playerId != this.playerId) {  // Opponent cat judge.
+          const stone: Stone = val.playerId + 1
+          if (this.board.canPut(val.x, val.y, stone)) {
+            console.log(`OK PUT (${val.x}, ${val.y}): ${stone}`)
+            this.movesRef.push({x: val.x, y: val.y, stone})
+          }
+        }
+        break
+      }
+    })
+  }
+
+  watchMoves() {
+    this.movesRef = this.reversiRef.child('moves')
+    this.movesRef.on('child_added', (snapshot) => {
+      const cell = snapshot.val()
+      console.log(cell)
+      const n = this.board.putStone(cell.x, cell.y, cell.stone)
+    })
+  }
+
+  cellClicked(x: number, y: number) {
+    if (!this.board.isTurn)
+      return
+    console.log(`cellClicked: (${x}, ${y})`)
+    this.actionRef.set({action: Action.PUT, playerId: this.playerId, x, y})
   }
 }
 
@@ -112,6 +170,7 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
   </div>
   <div class="pull-left" style="margin-left: 8px;">
     <div>PlayerId: {{gameController.playerId}}</div>
+    <div>PlayerState: {{gameController.playerState}}</div>
     <div>OnlinePlayers: {{gameController.onlinePlayers}}
       <input [hidden]="!isEnableLogin()" type="button"
              (click)="login()"
@@ -167,7 +226,7 @@ export class TopPage {
   }
 
   cellClicked(cell) {
-    //this.movesRef.push(cell)
+    this.gameController.cellClicked(cell.x, cell.y)
   }
 
   reset() {
