@@ -4,36 +4,53 @@ function isValidPos(x, y) {
   return x >= 0 && x < 8 && y >= 0 && y < 8
 }
 
+export enum Stone {
+  EMPTY,
+  BLACK,
+  WHITE,
+}
+
+export module Stone {
+  export function opposite(stone: Stone) {
+    switch (stone) {
+    case Stone.BLACK: return Stone.WHITE
+    case Stone.WHITE: return Stone.BLACK
+    default: return Stone.EMPTY
+    }
+  }
+}
+
 export class Cell {
-  constructor(public x: number, public y: number, public stone: number) {
+  constructor(public x: number, public y: number, public stone: Stone) {
   }
 }
 
 export class Board {
   public board: Array<Array<Cell>>
-  public turn: number
+  public turn: Stone
   public gameOver: boolean
-  public winPlayer: number
+  public winPlayer: Stone
   stoneCount: Array<number>
 
   constructor() {
     this.board = Board.createInitialBoard()
-    this.turn = 0
+    this.turn = Stone.BLACK
     this.gameOver = false
     this.winPlayer = -1
-    this.stoneCount = [2, 2]
+    this.stoneCount = []
+    this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 2
   }
 
   // Returns whether the stone can put the location, and flip-able count
-  canPut(x, y, stone) {
+  canPut(x: number, y: number, stone: Stone) {
     return this.doPutStone(x, y, stone, false)
   }
 
-  putStone(x, y, stone) {
+  putStone(x: number, y: number, stone: Stone) {
     return this.doPutStone(x, y, stone, true)
   }
 
-  private doPutStone(x, y, stone, flip) {
+  private doPutStone(x: number, y: number, stone: Stone, flip: boolean) {
     let flipped = 0
     for (let i = -1; i <= 1; ++i) {
       for (let j = -1; j <= 1; ++j) {
@@ -44,16 +61,16 @@ export class Board {
     }
     if (flip && flipped >= 0) {
       this.board[y][x].stone = stone
-      this.stoneCount[stone - 1] += flipped + 1
-      this.stoneCount[2 - stone] -= flipped
+      this.stoneCount[stone] += flipped + 1
+      this.stoneCount[Stone.opposite(stone)] -= flipped
       this.checkGameOver()
 
-      this.turn = 1 - (stone - 1)
+      this.turn = Stone.opposite(stone)
     }
     return flipped
   }
 
-  checkReverse(x, y, dx, dy, stone, flip) {
+  checkReverse(x: number, y: number, dx: number, dy: number, stone: Stone, flip: boolean) {
     const opponent = 3 - stone
     let n = 0
     let xx = x, yy = y
@@ -90,32 +107,28 @@ export class Board {
   }
 
   checkGameOver() {
-    if ((this.stoneCount[0] + this.stoneCount[1] >= 64) ||  // Full.
-        (this.stoneCount[0] == 0) ||
-        (this.stoneCount[1] == 0)) {
+    if ((this.stoneCount[Stone.BLACK] + this.stoneCount[Stone.WHITE] >= 64) ||  // Full.
+        (this.stoneCount[Stone.BLACK] == 0) ||
+        (this.stoneCount[Stone.WHITE] == 0)) {
       this.gameOver = true
-      if (this.stoneCount[0] > this.stoneCount[1])
-        this.winPlayer = 1
-      else if (this.stoneCount[0] < this.stoneCount[1])
-        this.winPlayer = 2
+      if (this.stoneCount[Stone.BLACK] > this.stoneCount[Stone.WHITE])
+        this.winPlayer = Stone.BLACK
+      else if (this.stoneCount[Stone.BLACK] < this.stoneCount[Stone.WHITE])
+        this.winPlayer = Stone.WHITE
       else
-        this.winPlayer = 0  // draw
+        this.winPlayer = Stone.EMPTY  // draw
     }
   }
 
   static createInitialBoard(): Array<Array<Cell>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
-        let stone = 0
+        let stone = Stone.EMPTY
         if ((x == 3 && y == 3) || (x == 4 && y == 4))
-          stone = 1
+          stone = Stone.BLACK
         if ((x == 3 && y == 4) || (x == 4 && y == 3))
-          stone = 2
-        return {
-          x,
-          y,
-          stone,
-        }
+          stone = Stone.WHITE
+        return new Cell(x, y, stone)
       })
     })
   }

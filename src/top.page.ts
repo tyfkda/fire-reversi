@@ -20,7 +20,7 @@ import {Board} from './board'
   <div class="pull-left" style="margin-left: 8px;">
     <div>Turn: {{board.turn==0?'Black':'White'}}</div>
     <br>
-    <div>Black:#{{board.stoneCount[0]}}, White:{{board.stoneCount[1]}}</div>
+    <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
     <br>
     <div [hidden]="!board.gameOver">
       <div [hidden]="board.winPlayer!=1">BLACK win!</div>
@@ -52,7 +52,7 @@ export class TopPage {
     this.board = new Board()
   }
 
-  cellClicked(cell) {
+  cellClicked(cell: Cell) {
     this.movesRef.push(cell)
   }
 }

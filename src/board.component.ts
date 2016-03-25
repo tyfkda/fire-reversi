@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter} from 'angular2/core'
 import {FirebaseEventPipe} from './firebasepipe'
 import _ from 'lodash'
 
-import {Board, Cell} from './board'
+import {Board, Cell, Stone} from './board'
 
 @Component({
   selector: 'board',
@@ -19,23 +19,24 @@ export class BoardComponent {
   @Input() board: Board
   @Output() cellClicked = new EventEmitter()
 
-  getCellImage(cell) {
+  getCellImage(cell: Cell) {
     switch (cell.stone) {
-    case 1:  return 'assets/black.png'
-    case 2:  return 'assets/white.png'
-    default:  return 'assets/empty.png'
+    case Stone.BLACK:  return 'assets/black.png'
+    case Stone.WHITE:  return 'assets/white.png'
+    case Stone.EMPTY:  return 'assets/empty.png'
+    default:  return null
     }
   }
 
-  onClickCell(cell) {
-    if (cell.stone != 0)
+  onClickCell(cell: Cell) {
+    if (cell.stone != Stone.EMPTY)
       return
-    const myStone = this.board.turn + 1
-    const n = this.board.canPut(cell.x, cell.y, myStone)
+    const stone = this.board.turn
+    const n = this.board.canPut(cell.x, cell.y, stone)
     if (n <= 0)
       return
 
-    cell.stone = myStone
+    cell.stone = stone
     this.cellClicked.emit(cell)
   }
 }
