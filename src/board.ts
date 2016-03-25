@@ -66,7 +66,7 @@ export class Board {
   }
 
   checkReverse(x: number, y: number, dx: number, dy: number, stone: Stone, flip: boolean) {
-    const opponent = 3 - stone
+    const opponent = Stone.opposite(stone)
     let n = 0
     let xx = x, yy = y
     for (;;) {
@@ -74,9 +74,9 @@ export class Board {
       yy += dy
       if (!isValidPos(xx, yy))
         return 0
-      const c = this.board[yy][xx]
-      if (c != opponent) {
-        if (n > 0 && c == stone)
+      const s = this.board[yy][xx]
+      if (s != opponent) {
+        if (n > 0 && s == stone)
           break
         return 0
       }
@@ -93,8 +93,8 @@ export class Board {
     for (;;) {
       xx += dx
       yy += dy
-      const c = this.board[yy][xx]
-      if (c != opponent)
+      const s = this.board[yy][xx]
+      if (s != opponent)
         break
       this.board[yy][xx] = stone
     }
