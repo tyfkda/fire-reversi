@@ -1,9 +1,5 @@
 import _ from 'lodash'
 
-function isValidPos(x, y) {
-  return x >= 0 && x < 8 && y >= 0 && y < 8
-}
-
 export enum Stone {
   EMPTY,
   BLACK,
@@ -72,7 +68,7 @@ export class Board {
     for (;;) {
       xx += dx
       yy += dy
-      if (!isValidPos(xx, yy))
+      if (!Board.isValidPos(xx, yy))
         return 0
       const s = this.board[yy][xx]
       if (s != opponent) {
@@ -126,5 +122,9 @@ export class Board {
         return stone
       })
     })
+  }
+
+  static isValidPos(x: number, y: number): boolean {
+    return x >= 0 && x < 8 && y >= 0 && y < 8
   }
 }
