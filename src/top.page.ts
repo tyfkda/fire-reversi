@@ -3,7 +3,7 @@ import {FirebaseEventPipe} from './firebasepipe'
 import _ from 'lodash'
 
 import {BoardComponent} from './board.component'
-import {Board} from './board'
+import {Board, Stone} from './board'
 
 /// <reference path="../typings/main/ambient/firebase/index.d.ts" />
 
@@ -50,7 +50,7 @@ export class TopPage {
     this.board = new Board()
   }
 
-  cellClicked(cell: Cell) {
+  cellClicked(cell) {
     this.movesRef.push(cell)
   }
 }

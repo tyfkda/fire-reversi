@@ -2,15 +2,15 @@ import {Component, Input, Output, EventEmitter} from 'angular2/core'
 import {FirebaseEventPipe} from './firebasepipe'
 import _ from 'lodash'
 
-import {Board, Cell, Stone} from './board'
+import {Board, Stone} from './board'
 
 @Component({
   selector: 'board',
   template: `
-<div *ngFor="#row of board.board"
-  ><span *ngFor="#cell of row"
-    ><img [src]="getCellImage(cell)"
-          (click)="onClickCell(cell)"
+<div *ngFor="#row of board.board, #i=index"
+  ><span *ngFor="#cell of row, #j=index"
+    ><img [src]="getCellImage(j, i)"
+          (click)="onClickCell(j, i)"
   ></span
 ></div>
     `,
@@ -19,8 +19,9 @@ export class BoardComponent {
   @Input() board: Board
   @Output() cellClicked = new EventEmitter()
 
-  getCellImage(cell: Cell) {
-    switch (cell.stone) {
+  getCellImage(x: number, y: number) {
+    const stone = this.board.board[y][x]
+    switch (stone) {
     case Stone.BLACK:  return 'assets/black.png'
     case Stone.WHITE:  return 'assets/white.png'
     case Stone.EMPTY:  return 'assets/empty.png'
@@ -28,15 +29,15 @@ export class BoardComponent {
     }
   }
 
-  onClickCell(cell: Cell) {
-    if (cell.stone != Stone.EMPTY)
+  onClickCell(x: number, y: number) {
+    const stone = this.board.board[y][x]
+    if (stone != Stone.EMPTY)
       return
     const stone = this.board.turn
-    const n = this.board.canPut(cell.x, cell.y, stone)
+    const n = this.board.canPut(x, y, stone)
     if (n <= 0)
       return
 
-    cell.stone = stone
-    this.cellClicked.emit(cell)
+    this.cellClicked.emit({x, y, stone})
   }
 }

@@ -20,13 +20,8 @@ export module Stone {
   }
 }
 
-export class Cell {
-  constructor(public x: number, public y: number, public stone: Stone) {
-  }
-}
-
 export class Board {
-  public board: Array<Array<Cell>>
+  public board: Array<Array<Stone>>
   public turn: Stone
   public gameOver: boolean
   public winPlayer: Stone
@@ -60,7 +55,7 @@ export class Board {
       }
     }
     if (flip && flipped >= 0) {
-      this.board[y][x].stone = stone
+      this.board[y][x] = stone
       this.stoneCount[stone] += flipped + 1
       this.stoneCount[Stone.opposite(stone)] -= flipped
       this.checkGameOver()
@@ -79,7 +74,7 @@ export class Board {
       yy += dy
       if (!isValidPos(xx, yy))
         return 0
-      const c = this.board[yy][xx].stone
+      const c = this.board[yy][xx]
       if (c != opponent) {
         if (n > 0 && c == stone)
           break
@@ -98,10 +93,10 @@ export class Board {
     for (;;) {
       xx += dx
       yy += dy
-      const c = this.board[yy][xx].stone
+      const c = this.board[yy][xx]
       if (c != opponent)
         break
-      this.board[yy][xx].stone = stone
+      this.board[yy][xx] = stone
     }
     return n
   }
@@ -120,7 +115,7 @@ export class Board {
     }
   }
 
-  static createInitialBoard(): Array<Array<Cell>> {
+  static createInitialBoard(): Array<Array<Stone>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
         let stone = Stone.EMPTY
@@ -128,7 +123,7 @@ export class Board {
           stone = Stone.BLACK
         if ((x == 3 && y == 4) || (x == 4 && y == 3))
           stone = Stone.WHITE
-        return new Cell(x, y, stone)
+        return stone
       })
     })
   }
