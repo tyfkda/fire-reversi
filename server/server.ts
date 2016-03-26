@@ -31,7 +31,7 @@ class Server {
           console.error('Login failed!', error)
           return
         }
-        console.log('Authenticated successfully with payload:', authData)
+        console.log('Authenticated successfully')
 
         this.resetGame()
         this.startWatching()
@@ -56,21 +56,20 @@ class Server {
     this.movesRef = this.rootRef.child('moves')
 
     this.actionRef = this.rootRef.child('action')
-    this.actionRefHandler = this.actionRef.on('value', onlineSnap => {
+    this.actionRef.on('value', onlineSnap => {
       const val = onlineSnap.val()
-      console.log(val)
       if (val == null) {
         this.resetGame()
         return
       }
       switch (val.action) {
       case Action.PUT:
+        console.log(val)
         const stone: Stone = val.playerId + 1
         if (this.board.turn == stone &&
             this.board.canPut(val.x, val.y, stone)) {
           this.movesRef.push({x: val.x, y: val.y, stone})
           this.board.putStone(val.x, val.y, stone)
-          console.log(`B:${this.board.stoneCount[Stone.BLACK]}, W:${this.board.stoneCount[Stone.WHITE]}`)
           if (this.board.gameOver) {
             this.finishGame()
           }
