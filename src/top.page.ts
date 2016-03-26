@@ -193,22 +193,24 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
     </div>
 
     <div *ngIf="board.isPlaying||board.gameOver">
-      <div>
-        <div *ngIf="gameController.playerId==0">You: BLACK</div>
-        <div *ngIf="gameController.playerId==1">You: WHITE</div>
+      <div [ngSwitch]="gameController.playerId">
+        <template [ngSwitchWhen]="0">You: BLACK</template>
+        <template [ngSwitchWhen]="1">You: WHITE</template>
       </div>
       <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
     </div>
     <div *ngIf="board.isPlaying">
-      <div>
-        <div *ngIf="gameController.isMyTurn">Your turn</div>
-        <div *ngIf="!gameController.isMyTurn">Opponent thinking...</div>
+      <div [ngSwitch]="gameController.isMyTurn">
+        <template [ngSwitchWhen]="true">Your turn</template>
+        <template [ngSwitchWhen]="false">Opponent thinking...</template>
       </div>
     </div>
     <div *ngIf="board.gameOver">
-      <div *ngIf="board.winPlayer-1==gameController.playerId">You win!</div>
-      <div *ngIf="board.winPlayer-1!=gameController.playerId">You lose...</div>
-      <div *ngIf="board.winPlayer==0">draw</div>
+      <div [ngSwitch]="board.winPlayer">
+        <template [ngSwitchWhen]="0">draw</template>
+        <template [ngSwitchWhen]="gameController.playerId+1">You win!</template>
+        <template ngSwitchDefault>You lose...</template>
+      </div>
     </div>
   </div>
 </div>
