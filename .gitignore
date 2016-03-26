@@ -3,4 +3,6 @@ typings/
 npm-debug.log
 firebase-debug.log
 
+/server/*.js
+
 /app/

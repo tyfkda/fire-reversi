@@ -154,25 +154,6 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
 
   watchAction() {
     this.actionRef = this.reversiRef.child('action')
-    this.actionRefHandler = this.actionRef.on('value', onlineSnap => {
-      const val = onlineSnap.val()
-      console.log('Action:')
-      console.log(val)
-      if (val == null)
-        return
-      switch (val.action) {
-      case Action.PUT:
-        if (!this.board.isTurn &&
-            val.playerId != this.playerId) {  // Opponent cat judge.
-          const stone: Stone = val.playerId + 1
-          if (this.board.canPut(val.x, val.y, stone)) {
-            console.log(`OK PUT (${val.x}, ${val.y}): ${stone}`)
-            this.movesRef.push({x: val.x, y: val.y, stone})
-          }
-        }
-        break
-      }
-    })
   }
 
   watchMoves() {
