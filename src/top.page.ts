@@ -186,28 +186,29 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
   </div>
   <div class="pull-left" style="margin-left: 8px;">
     <div>
-      <input [hidden]="!isEnableLogin()" type="button"
+      <input *ngIf="isEnableLogin()"
+             type="button"
              (click)="login()"
              value="Login">
     </div>
 
-    <div [hidden]="!(board.isPlaying||board.gameOver)">
+    <div *ngIf="board.isPlaying||board.gameOver">
       <div>
-        <div [hidden]="gameController.playerId!=0">You: BLACK</div>
-        <div [hidden]="gameController.playerId!=1">You: WHITE</div>
+        <div *ngIf="gameController.playerId==0">You: BLACK</div>
+        <div *ngIf="gameController.playerId==1">You: WHITE</div>
       </div>
       <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
     </div>
-    <div [hidden]="!board.isPlaying">
+    <div *ngIf="board.isPlaying">
       <div>
-        <div [hidden]="!gameController.isMyTurn">Your turn</div>
-        <div [hidden]="gameController.isMyTurn">Opponent thinking...</div>
+        <div *ngIf="gameController.isMyTurn">Your turn</div>
+        <div *ngIf="!gameController.isMyTurn">Opponent thinking...</div>
       </div>
     </div>
-    <div [hidden]="!board.gameOver">
-      <div [hidden]="board.winPlayer-1!=gameController.playerId">You win!</div>
-      <div [hidden]="board.winPlayer-1==gameController.playerId">You lose...</div>
-      <div [hidden]="board.winPlayer!=0">draw</div>
+    <div *ngIf="board.gameOver">
+      <div *ngIf="board.winPlayer-1==gameController.playerId">You win!</div>
+      <div *ngIf="board.winPlayer-1!=gameController.playerId">You lose...</div>
+      <div *ngIf="board.winPlayer==0">draw</div>
     </div>
   </div>
 </div>
