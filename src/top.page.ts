@@ -41,6 +41,14 @@ export class GameController {
     this.watchOnlinePlayers()
   }
 
+  get isPlaying() {
+    return this.playerState == PlayerState.PLAYING
+  }
+
+  get isMyTurn() {
+    return this.board.turn - 1 == this.playerId
+  }
+
   reset() {
     this.board.clear()
     this.finishGame()
@@ -74,6 +82,7 @@ export class GameController {
 
     this.playerId = -1
     this.playerState = PlayerState.JOINING
+    this.board.clear()
     const f = (i) => {
       this.tryToJoin(i)
         .then(() => {
@@ -197,23 +206,30 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
            (cellClicked)="cellClicked($event)"></board>
   </div>
   <div class="pull-left" style="margin-left: 8px;">
-    <div>PlayerId: {{gameController.playerId}}</div>
-    <div>PlayerState: {{gameController.playerState}}</div>
-    <div>OnlinePlayers: {{gameController.onlinePlayers}}
+    <div>
       <input [hidden]="!isEnableLogin()" type="button"
              (click)="login()"
              value="Login">
     </div>
 
-    <div [hidden]="board.gameOver">Turn: {{board.turn==1?'Black':'White'}}</div>
+    <div [hidden]="!(board.isPlaying||board.gameOver)">
+      <div>
+        <div [hidden]="gameController.playerId!=0">You: BLACK</div>
+        <div [hidden]="gameController.playerId!=1">You: WHITE</div>
+      </div>
+      <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
+    </div>
+    <div [hidden]="!board.isPlaying">
+      <div>
+        <div [hidden]="!gameController.isMyTurn">Your turn</div>
+        <div [hidden]="gameController.isMyTurn">Opponent thinking...</div>
+      </div>
+    </div>
     <div [hidden]="!board.gameOver">
-      <div [hidden]="board.winPlayer!=1">BLACK win!</div>
-      <div [hidden]="board.winPlayer!=2">WHITE win!</div>
+      <div [hidden]="board.winPlayer-1!=gameController.playerId">You win!</div>
+      <div [hidden]="board.winPlayer-1==gameController.playerId">You lose...</div>
       <div [hidden]="board.winPlayer!=0">draw</div>
     </div>
-    <br>
-    <div>Black:#{{board.stoneCount[1]}}, White:{{board.stoneCount[2]}}</div>
-    <br>
   </div>
 </div>
 

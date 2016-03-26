@@ -21,32 +21,46 @@ export class Cell {
   canPut: boolean
 }
 
+enum BoardState {
+  WAITING,
+  PLAYING,
+  FINISHED,
+}
+
 export class Board {
   public board: Array<Array<Cell>>
   public turn: Stone
-  public gameOver: boolean
   public winPlayer: Stone
   stoneCount: Array<number>
   private playerStone: Stone
+  private state: BoardState
 
   constructor() {
     this.clear()
   }
 
+  get isPlaying() {
+    return this.state == BoardState.PLAYING
+  }
+
+  get gameOver() {
+    return this.state == BoardState.FINISHED
+  }
+
   clear() {
     this.board = Board.createInitialBoard(false)
     this.turn = Stone.BLACK
-    this.gameOver = true
+    this.state = BoardState.WAITING
     this.winPlayer = -1
     this.stoneCount = []
     this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 0
   }
 
   startGame(playerId: number) {
+    this.state = BoardState.PLAYING
     this.board = Board.createInitialBoard(true)
     this.playerStone = playerId + 1  // 0=>BLACK, 1=>WHITE
     this.turn = Stone.BLACK
-    this.gameOver = false
     this.winPlayer = -1
     this.stoneCount = []
     this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 2
@@ -136,7 +150,7 @@ export class Board {
     if ((this.stoneCount[Stone.BLACK] + this.stoneCount[Stone.WHITE] >= 64) ||  // Full.
         (this.stoneCount[Stone.BLACK] == 0) ||
         (this.stoneCount[Stone.WHITE] == 0)) {
-      this.gameOver = true
+      this.state = BoardState.FINISHED
       if (this.stoneCount[Stone.BLACK] > this.stoneCount[Stone.WHITE])
         this.winPlayer = Stone.BLACK
       else if (this.stoneCount[Stone.BLACK] < this.stoneCount[Stone.WHITE])
