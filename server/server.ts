@@ -33,14 +33,23 @@ class Server {
         }
         console.log('Authenticated successfully with payload:', authData)
 
+        this.resetGame()
         this.startWatching()
       })
+  }
+
+  finishGame() {
+    console.log('Finish game')
+    this.resetGame()
   }
 
   resetGame() {
     console.log('Reset game')
     this.board = new Board()
     this.board.startGame(0)
+
+    this.rootRef.child('action').remove()
+    this.rootRef.child('moves').remove()
   }
 
   startWatching() {
@@ -61,6 +70,10 @@ class Server {
             this.board.canPut(val.x, val.y, stone)) {
           this.movesRef.push({x: val.x, y: val.y, stone})
           this.board.putStone(val.x, val.y, stone)
+          console.log(`B:${this.board.stoneCount[Stone.BLACK]}, W:${this.board.stoneCount[Stone.WHITE]}`)
+          if (this.board.gameOver) {
+            this.finishGame()
+          }
         }
         break
       }

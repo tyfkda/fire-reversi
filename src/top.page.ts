@@ -32,7 +32,7 @@ export class GameController {
   private movesRef: Firebase
   private movesRefHandler: any
 
-  constructor(private reversiRef: Firebase) {
+  constructor(private rootRef: Firebase) {
     this.playerId = -1
     this.playerState = PlayerState.WATCHING
     this.onlinePlayers = -1
@@ -66,8 +66,6 @@ export class GameController {
       this.movesRefHandler = null
     }
     this.onlinePlayersRef.remove()
-    this.reversiRef.child('action').remove()
-    this.reversiRef.child('moves').remove()
     this.playerState = PlayerState.WATCHING
   }
 
@@ -101,7 +99,7 @@ export class GameController {
   }
 
   watchOnlinePlayers() {
-    this.onlinePlayersRef = this.reversiRef.child('onlinePlayers')
+    this.onlinePlayersRef = this.rootRef.child('onlinePlayers')
     this.onlinePlayersRef.on('value', onlineSnap => {
       let val = onlineSnap.val() || 0
       console.log(`onlinePlayers=${val}, playerState=${this.playerState}, playerId=${this.playerId}`)
@@ -117,7 +115,7 @@ export class GameController {
   tryToJoin(playerNum) {
     return new Promise((resolve, reject) => {
 console.log(`tryToJoin: as ${playerNum}`)
-      this.reversiRef.child('onlinePlayers').transaction(onlineVal => {
+      this.rootRef.child('onlinePlayers').transaction(onlineVal => {
         const val = onlineVal || 0
         const bit = 1 << playerNum
         if ((val & (1 << playerNum)) == 0) {
@@ -153,11 +151,11 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
   }
 
   watchAction() {
-    this.actionRef = this.reversiRef.child('action')
+    this.actionRef = this.rootRef.child('action')
   }
 
   watchMoves() {
-    this.movesRef = this.reversiRef.child('moves')
+    this.movesRef = this.rootRef.child('moves')
     this.movesRefHandler = this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
       console.log(cell)
@@ -221,14 +219,14 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
 })
 export class TopPage {
   reversiUrl: string
-  reversiRef: Firebase
+  rootRef: Firebase
   gameController: GameController
 
   constructor() {
     this.reversiUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/'
-    this.reversiRef = new Firebase(this.reversiUrl)
+    this.rootRef = new Firebase(this.reversiUrl)
 
-    this.gameController = new GameController(this.reversiRef)
+    this.gameController = new GameController(this.rootRef)
   }
 
   get board() {
