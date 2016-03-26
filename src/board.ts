@@ -27,19 +27,34 @@ export class Board {
   public gameOver: boolean
   public winPlayer: Stone
   stoneCount: Array<number>
+  private playerStone: Stone
 
   constructor() {
-    this.reset()
+    this.clear()
   }
 
-  reset() {
-    this.board = Board.createInitialBoard()
+  clear() {
+    this.board = Board.createInitialBoard(false)
+    this.turn = Stone.BLACK
+    this.gameOver = true
+    this.winPlayer = -1
+    this.stoneCount = []
+    this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 0
+  }
+
+  startGame(playerId: number) {
+    this.board = Board.createInitialBoard(true)
+    this.playerStone = playerId + 1  // 0=>BLACK, 1=>WHITE
     this.turn = Stone.BLACK
     this.gameOver = false
     this.winPlayer = -1
     this.stoneCount = []
     this.stoneCount[Stone.BLACK] = this.stoneCount[Stone.WHITE] = 2
     this.scanBoard()
+  }
+
+  get isTurn() {
+    return this.turn == this.playerStone
   }
 
   // Returns whether the stone can put the location, and flip-able count
@@ -70,10 +85,9 @@ export class Board {
       this.checkGameOver()
       if (!this.gameOver) {
         this.turn = Stone.opposite(stone)
-        if (this.scanBoard() <= 0) {  // Cannot put!
+        if (this.scanBoard() == 0) {  // Cannot put!
           this.turn = stone
-          const n = this.scanBoard()
-          if (n <= 0) {
+          if (this.scanBoard() == 0) {
             console.error(`Something wrong: cannot put both player`)
           }
         }
@@ -132,28 +146,35 @@ export class Board {
     }
   }
 
+  // > 0: Enable place count.
+  //   0: No place.
+  //  -1: Not your turn.
   scanBoard(): number {
+    const turn = this.turn == this.playerStone
     let handCount = 0
     this.board.forEach((row, i) => {
       row.forEach((cell, j) => {
-        cell.canPut = this.canPut(j, i, this.turn) > 0
-        handCount += cell.canPut ? 1 : 0
+        const canPut = this.canPut(j, i, this.turn) > 0
+        cell.canPut = turn && canPut
+        handCount += canPut ? 1 : 0
       })
     })
-    return handCount
+    return (turn || handCount == 0) ? handCount : -1
   }
 
-  static createInitialBoard(): Array<Array<Cell>> {
+  static createInitialBoard(flag: boolean): Array<Array<Cell>> {
     return _.range(8).map(y => {
       return _.range(8).map(x => {
         let stone = Stone.EMPTY
-        if ((x == 3 && y == 3) || (x == 4 && y == 4))
-          stone = Stone.BLACK
-        if ((x == 3 && y == 4) || (x == 4 && y == 3))
-          stone = Stone.WHITE
+        if (flag) {
+          if ((x == 3 && y == 3) || (x == 4 && y == 4))
+            stone = Stone.BLACK
+          if ((x == 3 && y == 4) || (x == 4 && y == 3))
+            stone = Stone.WHITE
+        }
         return {
           stone,
-          canPut: stone == Stone.EMPTY,
+          canPut: false,
         }
       })
     })
