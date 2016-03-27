@@ -1,4 +1,5 @@
 import {Component} from 'angular2/core'
+import {ChangeDetectorRef, Inject} from 'angular2/core'
 import {FirebaseEventPipe} from './firebasepipe'
 import _ from 'lodash'
 
@@ -32,7 +33,7 @@ export class GameController {
   private movesRef: Firebase
   private movesRefHandler: any
 
-  constructor(private rootRef: Firebase) {
+  constructor(private rootRef: Firebase, private cdRef: ChangeDetectorRef) {
     this.playerId = -1
     this.playerState = PlayerState.WATCHING
     this.onlinePlayers = -1
@@ -102,10 +103,11 @@ export class GameController {
     this.onlinePlayersRef = this.rootRef.child('onlinePlayers')
     this.onlinePlayersRef.on('value', onlineSnap => {
       let val = onlineSnap.val() || 0
-      console.log(`onlinePlayers=${val}, playerState=${this.playerState}, playerId=${this.playerId}`)
+console.log(`onlinePlayers=${val}, playerState=${this.playerState}, playerId=${this.playerId}`)
       this.onlinePlayers = val
 
       this.tryStartGame()
+      this.cdRef.detectChanges()
     })
   }
 
@@ -114,7 +116,7 @@ export class GameController {
    */
   tryToJoin(playerNum) {
     return new Promise((resolve, reject) => {
-console.log(`tryToJoin: as ${playerNum}`)
+//console.log(`tryToJoin: as ${playerNum}`)
       this.rootRef.child('onlinePlayers').transaction(onlineVal => {
         const val = onlineVal || 0
         const bit = 1 << playerNum
@@ -124,7 +126,7 @@ console.log(`tryToJoin: as ${playerNum}`)
           return  // Somebody must have beat us. Abort the transaction.
         }
       }, (error, committed) => {
-console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
+//console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
         if (committed) {  // We got in!
           resolve()
         } else {
@@ -158,18 +160,18 @@ console.log(`tryToJoin, result: error=${error}, committed=${committed}`)
     this.movesRef = this.rootRef.child('moves')
     this.movesRefHandler = this.movesRef.on('child_added', (snapshot) => {
       const cell = snapshot.val()
-      console.log(cell)
+console.log(cell)
       this.board.putStone(cell.x, cell.y, cell.stone)
       if (this.board.gameOver) {
         this.finishGame()
       }
+      this.cdRef.detectChanges()
     })
   }
 
   cellClicked(x: number, y: number) {
     if (!this.board.isTurn)
       return
-    console.log(`cellClicked: (${x}, ${y})`)
     this.actionRef.set({action: Action.PUT, playerId: this.playerId, x, y})
   }
 }
@@ -225,11 +227,11 @@ export class TopPage {
   rootRef: Firebase
   gameController: GameController
 
-  constructor() {
+  constructor(@Inject(ChangeDetectorRef) cdRef: ChangeDetectorRef) {
     this.reversiUrl = 'https://2nqujjklgij2gg6v.firebaseio.com/'
     this.rootRef = new Firebase(this.reversiUrl)
 
-    this.gameController = new GameController(this.rootRef)
+    this.gameController = new GameController(this.rootRef, cdRef)
   }
 
   get board() {
@@ -241,7 +243,6 @@ export class TopPage {
   }
 
   login() {
-    console.log('login clicked')
     this.gameController.login()
   }
 
