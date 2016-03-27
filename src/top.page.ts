@@ -46,6 +46,10 @@ export class GameController {
     return this.playerState == PlayerState.PLAYING
   }
 
+  get isWaiting() {
+    return this.playerState == PlayerState.WAITING_OTHERS
+  }
+
   get isMyTurn() {
     return this.board.turn - 1 == this.playerId
   }
@@ -193,6 +197,7 @@ console.log(cell)
              (click)="login()"
              value="Login">
     </div>
+    <div *ngIf="gameController.isWaiting">Waiting other player...</div>
 
     <div *ngIf="board.isPlaying||board.gameOver">
       <div [ngSwitch]="gameController.playerId">
