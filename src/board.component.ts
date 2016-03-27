@@ -8,15 +8,17 @@ import {Board, Stone} from './board'
   selector: 'board',
   template: `
 <style>
-  .canPut {
+  .cell.canPut {
     cursor: pointer;
   }
 </style>
 <div *ngFor="#row of board.board, #i=index"
   ><span *ngFor="#cell of row, #j=index"
-    ><img [src]="getCellImage(j, i)"
+    ><img class="cell"
+          [src]="getCellImage(j, i)"
           [class.canPut]="canPut(j, i)"
           (click)="onClickCell(j, i)"
+          (mousedown)="false"
   ></span
 ></div>
     `,
